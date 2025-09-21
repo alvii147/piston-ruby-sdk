@@ -12,7 +12,7 @@
 
 <div align="center">
 
-[![GitHub Actions](https://img.shields.io/github/actions/workflow/status/alvii147/piston-ruby-sdk/main.yml?branch=main&label=GitHub%20Actions&logo=github)](https://github.com/alvii147/piston-ruby-sdk/actions) [![License](https://img.shields.io/github/license/alvii147/piston-ruby-sdk)](https://github.com/alvii147/piston-ruby-sdk/blob/main/LICENSE)
+[![Gem Version](https://badge.fury.io/rb/piston_sdk.svg)](https://badge.fury.io/rb/piston_sdk) [![GitHub Actions](https://img.shields.io/github/actions/workflow/status/alvii147/piston-ruby-sdk/main.yml?branch=main&label=GitHub%20Actions&logo=github)](https://github.com/alvii147/piston-ruby-sdk/actions) [![License](https://img.shields.io/github/license/alvii147/piston-ruby-sdk)](https://github.com/alvii147/piston-ruby-sdk/blob/main/LICENSE)
 
 </div>
 
