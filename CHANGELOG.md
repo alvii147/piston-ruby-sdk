@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Added
 
 - [Sorbet](https://sorbet.org/) type assertions.
+- Support for platforms `x86_64-darwin-23` and `x86_64-linux`
 
 ### Changed
 
