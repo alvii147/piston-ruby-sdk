@@ -8,12 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
-- [Sorbet](https://sorbet.org/) type assertions.
-- Support for platforms `x86_64-darwin-23` and `x86_64-linux`
-
 ### Changed
-
-- Improve documentation comments.
 
 ### Deprecated
 
@@ -22,6 +17,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Fixed
 
 ### Security
+
+## 0.2.0 2025-09-28
+
+### Added
+
+- [Sorbet](https://sorbet.org/) type assertions.
+- Support for platforms `x86_64-darwin-23` and `x86_64-linux`
+
+### Changed
+
+- Improve documentation comments.
 
 ## 0.1.0 - 2025-09-21
 
