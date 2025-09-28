@@ -1,78 +1,155 @@
+# typed: true
 # frozen_string_literal: true
 
 require "net/http"
 require "json"
+require "sorbet-runtime"
 require_relative "piston_sdk/version"
 
 # A minimal Ruby gem for using the [Piston API](https://github.com/engineer-man/piston).
 module PistonSDK
   # Data representation of a Piston runtime.
   class Runtime
-    attr_reader :language, :version, :aliases, :runtime
+    extend T::Sig
+
+    sig { returns(String) }
+    attr_reader :language
+
+    sig { returns(String) }
+    attr_reader :version
+
+    sig { returns(T::Array[String]) }
+    attr_reader :aliases
+
+    sig { returns(T.nilable(String)) }
+    attr_reader :runtime
 
     # Create a new Piston runtime.
     #
-    # @param data [Hash] JSON data.
+    # @param data [Hash] JSON data
+    sig { params(data: T::Hash[String, T.untyped]).void }
     def initialize(data)
-      @language = data["language"]
-      @version = data["version"]
-      @aliases = data["aliases"]
-      @runtime = data["runtime"]
+      @language = T.let(data["language"], String)
+      @version = T.let(data["version"], String)
+      @aliases = T.let(data["aliases"], T::Array[String])
+      @runtime = T.let(data["runtime"], T.nilable(String))
     end
   end
 
   # Data representation of Piston execution step details.
   class ExecutionStepDetails
-    attr_reader :stdout, :stderr, :output, :code, :signal, :message, :status, :cpu_time, :wall_time, :memory
+    extend T::Sig
+
+    sig { returns(String) }
+    attr_reader :stdout
+
+    sig { returns(String) }
+    attr_reader :stderr
+
+    sig { returns(String) }
+    attr_reader :output
+
+    sig { returns(T.nilable(Integer)) }
+    attr_reader :code
+
+    sig { returns(T.nilable(String)) }
+    attr_reader :signal
+
+    sig { returns(T.nilable(String)) }
+    attr_reader :message
+
+    sig { returns(T.nilable(String)) }
+    attr_reader :status
+
+    sig { returns(T.nilable(Integer)) }
+    attr_reader :cpu_time
+
+    sig { returns(T.nilable(Integer)) }
+    attr_reader :wall_time
+
+    sig { returns(T.nilable(Integer)) }
+    attr_reader :memory
 
     # Create new Piston execution step details.
     #
-    # @param data [Hash] JSON data.
+    # @param data [Hash] JSON data
+    sig { params(data: T::Hash[String, T.untyped]).void }
     def initialize(data)
-      @stdout = data["stdout"] unless data["stdout"].nil?
-      @stderr = data["stderr"] unless data["stderr"].nil?
-      @output = data["output"] unless data["output"].nil?
-      @code = data["code"] unless data["code"].nil?
-      @signal = data["signal"] unless data["signal"].nil?
-      @message = data["message"] unless data["message"].nil?
-      @status = data["status"] unless data["status"].nil?
-      @cpu_time = data["cpu_time"] unless data["cpu_time"].nil?
-      @wall_time = data["wall_time"] unless data["wall_time"].nil?
-      @memory = data["memory"] unless data["memory"].nil?
+      @stdout = T.let(data["stdout"], String)
+      @stderr = T.let(data["stderr"], String)
+      @output = T.let(data["output"], String)
+      @code = T.let(data["code"], T.nilable(Integer))
+      @signal = T.let(data["signal"], T.nilable(String))
+      @message = T.let(data["message"], T.nilable(String))
+      @status = T.let(data["status"], T.nilable(String))
+      @cpu_time = T.let(data["cpu_time"], T.nilable(Integer))
+      @wall_time = T.let(data["wall_time"], T.nilable(Integer))
+      @memory = T.let(data["memory"], T.nilable(Integer))
     end
   end
 
   # Data representation of Piston execution results.
   class ExecutionResults
-    attr_reader :language, :version, :run, :compile
+    extend T::Sig
+
+    sig { returns(String) }
+    attr_reader :language
+
+    sig { returns(String) }
+    attr_reader :version
+
+    sig { returns(ExecutionStepDetails) }
+    attr_reader :run
+
+    sig { returns(T.nilable(ExecutionStepDetails)) }
+    attr_reader :compile
 
     # Create new Piston execution results.
     #
-    # @param data [Hash] JSON data.
+    # @param data [Hash] JSON data
+    sig { params(data: T::Hash[String, T.untyped]).void }
     def initialize(data)
-      @language = data["language"]
-      @version = data["version"]
-      @run = ExecutionStepDetails.new(data["run"]) unless data["run"].nil?
-      @compile = ExecutionStepDetails.new(data["compile"]) unless data["compile"].nil?
+      @language = T.let(data["language"], String)
+      @version = T.let(data["version"], String)
+      @run = T.let(ExecutionStepDetails.new(data["run"]), ExecutionStepDetails)
+      @compile = T.let(
+        data["compile"] ? ExecutionStepDetails.new(data["compile"]) : nil,
+        T.nilable(ExecutionStepDetails)
+      )
     end
   end
 
   # HTTP client for the Piston API.
   class Client
+    extend T::Sig
+
     # Create a new client.
     #
-    # @param base_url [String] Base URL for API.
+    # @param base_url [String] Base URL for API
+    # @param retries [Integer] Number of automatic retries to perform when rate limit is reached
     # @param compile_timeout [Integer, nil] The maximum wall-time allowed for the compile stage to finish before bailing
-    # out in milliseconds.
+    # out in milliseconds
     # @param run_timeout [Integer, nil] The maximum wall-time allowed for the run stage to finish before bailing out in
-    # milliseconds.
+    # milliseconds
     # @param compile_cpu_time [Integer, nil] The maximum CPU-time allowed for the compile stage to finish before bailing
-    # out in milliseconds.
+    # out in milliseconds
     # @param run_cpu_time [Integer, nil] The maximum CPU-time allowed for the run stage to finish before bailing out in
-    # milliseconds.
+    # milliseconds
     # @param compile_memory_limit [Integer, nil] The maximum amount of memory the compile stage is allowed to use in
-    # bytes.
-    # @param run_memory_limit [Integer, nil] The maximum amount of memory the run stage is allowed to use in bytes.
+    # bytes
+    # @param run_memory_limit [Integer, nil] The maximum amount of memory the run stage is allowed to use in bytes
+    sig do
+      params(
+        base_url: String,
+        retries: Integer,
+        compile_timeout: T.nilable(Integer),
+        run_timeout: T.nilable(Integer),
+        compile_cpu_time: T.nilable(Integer),
+        run_cpu_time: T.nilable(Integer),
+        compile_memory_limit: T.nilable(Integer),
+        run_memory_limit: T.nilable(Integer)
+      ).void
+    end
     def initialize(
       base_url: "https://emkc.org/api/v2/piston",
       retries: 3,
@@ -83,32 +160,48 @@ module PistonSDK
       compile_memory_limit: nil,
       run_memory_limit: nil
     )
-      @uri = URI(base_url)
-      @retries = retries
-      @compile_timeout = compile_timeout
-      @run_timeout = run_timeout
-      @compile_cpu_time = compile_cpu_time
-      @run_cpu_time = run_cpu_time
-      @compile_memory_limit = compile_memory_limit
-      @run_memory_limit = run_memory_limit
-      @files = []
+      @uri = T.let(URI(base_url), URI::Generic)
+      @retries = T.let(retries, Integer)
+      @compile_timeout = T.let(compile_timeout, T.nilable(Integer))
+      @run_timeout = T.let(run_timeout, T.nilable(Integer))
+      @compile_cpu_time = T.let(compile_cpu_time, T.nilable(Integer))
+      @run_cpu_time = T.let(run_cpu_time, T.nilable(Integer))
+      @compile_memory_limit = T.let(compile_memory_limit, T.nilable(Integer))
+      @run_memory_limit = T.let(run_memory_limit, T.nilable(Integer))
+      @files = T.let([], T::Array[T::Hash[Symbol, String]])
 
-      @http = Net::HTTP.new(@uri.host, @uri.port)
+      @http = T.let(Net::HTTP.new(@uri.host, @uri.port), Net::HTTP)
       @http.use_ssl = true
 
-      @method_classes = Hash.new(Net::HTTP::Get)
-      @method_classes[:get] = Net::HTTP::Get
-      @method_classes[:post] = Net::HTTP::Post
+      @method_classes = T.let(
+        {
+          get: Net::HTTP::Get,
+          post: Net::HTTP::Post
+        },
+        T::Hash[Symbol, T.class_of(Net::HTTPRequest)]
+      )
     end
 
     # Perform raw HTTP request using exponential backoff on retries.
     #
-    # @param method [Symbol] HTTP method.
-    # @param path [String] URL Path.
+    # @param method [Symbol] HTTP method
+    # @param path [String] URL Path
     # @param body [Hash, nil] Optional request body
-    # @return [Hash, Array] JSON response.
+    # @return [Hash, Array] JSON response
+    sig do
+      params(
+        method: Symbol,
+        path: String,
+        body: T.nilable(T::Hash[Symbol, T.untyped])
+      ).returns(
+        T.any(
+          T::Hash[T.untyped, T.untyped],
+          T::Array[T.untyped]
+        )
+      )
+    end
     def request(method: :get, path: "", body: nil)
-      req = @method_classes[method].new("#{@uri}#{path}")
+      req = T.must(@method_classes[method]).new("#{@uri}#{path}")
       req["Content-Type"] = "application/json"
       req.body = body.to_json unless body.nil?
       res = @http.request(req)
@@ -118,20 +211,29 @@ module PistonSDK
 
         case res
         when Net::HTTPOK
-          return JSON.parse(res.body)
+          return JSON.parse(res.body || "{}")
         when Net::HTTPTooManyRequests
           sleep 2**attempt
         else
           raise "Request failed with status code #{res.code}, #{res.body}"
         end
       end
+
+      raise "Request failed due to rate limits after too many attempts"
     end
 
     # Add file to be sent to Piston for execution.
     #
-    # @param content [String] Content of the files to upload.
-    # @param name [String, nil] Name of the file to upload.
-    # @param encoding [String, nil] Encoding scheme used for the file content.
+    # @param content [String] Content of the files to upload
+    # @param name [String, nil] Name of the file to upload
+    # @param encoding [String, nil] Encoding scheme used for the file content
+    sig do
+      params(
+        content: String,
+        name: T.nilable(String),
+        encoding: T.nilable(String)
+      ).void
+    end
     def add_file(content:, name: nil, encoding: nil)
       file = {
         name: name,
@@ -142,25 +244,37 @@ module PistonSDK
       @files << file
     end
 
-    # Clear all files.
+    # Clear all files
+    sig { void }
     def clear_files
       @files.clear
     end
 
     # Get supported languages along with the current version and aliases.
     #
-    # @return [Array<Runtime>] Array of runtimes.
+    # @return [Array<Runtime>] List of supported runtimes
+    sig { returns(T::Array[Runtime]) }
     def runtimes
-      request(method: :get, path: "/runtimes").map { |data| Runtime.new(data) }
+      request(method: :get, path: "/runtimes").map do |data|
+        Runtime.new(T.cast(data, T::Hash[String, T.untyped]))
+      end
     end
 
     # Execute code for a given language and version using the added files.
     #
-    # @param language [String] Language to use for execution.
-    # @param version [String] Version of the language to use for execution.
-    # @param stdin [String, nil] Text to pass as stdin to the program.
-    # @param args [Array<String>] Arguments to pass to the program.
-    # @return [ExecutionResults] Execution results.
+    # @param language [String] Language to use for execution
+    # @param version [String] Version of the language to use for execution
+    # @param stdin [String, nil] Text to pass as stdin to the program
+    # @param args [Array<String>] Arguments to pass to the program
+    # @return [ExecutionResults] Execution results
+    sig do
+      params(
+        language: String,
+        version: String,
+        stdin: T.nilable(String),
+        args: T.nilable(T::Array[String])
+      ).returns(ExecutionResults)
+    end
     def execute(language:, version:, stdin: nil, args: nil)
       body = {
         language: language,
@@ -176,7 +290,9 @@ module PistonSDK
         run_memory_limit: @run_memory_limit
       }.compact
 
-      ExecutionResults.new(request(method: :post, path: "/execute", body: body))
+      ExecutionResults.new(
+        T.cast(request(method: :post, path: "/execute", body: body), T::Hash[String, T.untyped])
+      )
     end
 
     private :request
