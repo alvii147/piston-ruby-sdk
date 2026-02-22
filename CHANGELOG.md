@@ -8,9 +8,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
-- Support for new `token` parameter for optional authorization token.
-- Minimum ruby version through `.ruby-version`.
-
 ### Changed
 
 ### Deprecated
@@ -19,9 +16,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Fixed
 
-- `execute` no longer makes duplicate requests.
-
 ### Security
+
+## 0.3.0 2026-02-22
+
+### Added
+
+- Support for new `token` parameter for optional authorization token.
+- Minimum ruby version through `.ruby-version`.
+
+### Fixed
+
+- `execute` no longer makes duplicate requests.
 
 ## 0.2.0 2025-09-28
 
