@@ -141,6 +141,7 @@ module PistonSDK
     sig do
       params(
         base_url: String,
+        token: T.nilable(String),
         retries: Integer,
         compile_timeout: T.nilable(Integer),
         run_timeout: T.nilable(Integer),
@@ -152,6 +153,7 @@ module PistonSDK
     end
     def initialize(
       base_url: "https://emkc.org/api/v2/piston",
+      token: nil,
       retries: 3,
       compile_timeout: nil,
       run_timeout: nil,
@@ -161,6 +163,7 @@ module PistonSDK
       run_memory_limit: nil
     )
       @uri = T.let(URI(base_url), URI::Generic)
+      @token = T.let(token, T.nilable(String))
       @retries = T.let(retries, Integer)
       @compile_timeout = T.let(compile_timeout, T.nilable(Integer))
       @run_timeout = T.let(run_timeout, T.nilable(Integer))
@@ -203,8 +206,8 @@ module PistonSDK
     def request(method: :get, path: "", body: nil)
       req = T.must(@method_classes[method]).new("#{@uri}#{path}")
       req["Content-Type"] = "application/json"
+      req["Authorization"] = @token unless @token.nil?
       req.body = body.to_json unless body.nil?
-      res = @http.request(req)
 
       (0...@retries).each do |attempt|
         res = @http.request(req)
